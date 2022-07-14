@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Integer> {
-    Optional<Room> findByRoomId(String roomId);
+    Optional<Room> findByRoomCode(String roomCode);
 
     Optional<Room> findAllByRoomType(RoomType roomType);
 
-    boolean existsByRoomId(String roomId);
+    boolean existsByRoomCode(String roomCode);
 }

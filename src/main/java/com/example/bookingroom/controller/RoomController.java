@@ -17,10 +17,10 @@ public class RoomController {
         return ResponseEntity.ok(roomRepository.findAll());
     }
 
-    @GetMapping("/room/{id}")
+    @GetMapping("/room/{code}")
     public ResponseEntity<?> getRoom(
-            @PathVariable("id") String roomId) {
-        return ResponseEntity.ok(roomRepository.findByRoomId(roomId));
+            @PathVariable("code") String roomCode) {
+        return ResponseEntity.ok(roomRepository.findByRoomCode(roomCode));
     }
 
     @PostMapping("/room")
@@ -28,23 +28,23 @@ public class RoomController {
         return ResponseEntity.ok(roomRepository.save(room));
     }
 
-    @PutMapping("/room/{id}")
+    @PutMapping("/room/{code}")
     public ResponseEntity<?> modifyRoom(
-            @PathVariable("id") String roomId, Room room) {
+            @PathVariable("code") String roomCode,
+            Room room) {
         //TODO viết thêm các class custom exception
-        Room roomToModify = roomRepository.findByRoomId(roomId).get();
+        Room roomToModify = roomRepository.findByRoomCode(roomCode).get();
         //TODO viết lại test chuẩn hơn
-        if (room.getRoomId().equals(roomToModify.getRoomId())) {
+        if (room.getRoomCode().equals(roomToModify.getRoomCode())) {
             return ResponseEntity.ok(roomRepository.save(roomToModify));
         }
         return ResponseEntity.badRequest().body("Wrong room Id");
     }
 
-    @DeleteMapping("/room/{id}")
+    @DeleteMapping("/room/{code}")
     public ResponseEntity<?> deleteRoom(
-            @PathVariable(name = "id") String roomId) {
-        Room roomToDelete = roomRepository.findByRoomId(roomId).get();
-
+            @PathVariable(name = "code") String roomCode) {
+        Room roomToDelete = roomRepository.findByRoomCode(roomCode).get();
         //TODO viết lại test chuẩn hơn
         if (null != roomToDelete) {
             roomRepository.delete(roomToDelete);

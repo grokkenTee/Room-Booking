@@ -32,11 +32,9 @@ public abstract class BaseEntity implements Serializable {
     private String modifiedBy;
 
     @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createAt;
 
     @LastModifiedDate
-    @Temporal(TemporalType.TIMESTAMP)
     public LocalDateTime modifyAt;
 
 //    @Version

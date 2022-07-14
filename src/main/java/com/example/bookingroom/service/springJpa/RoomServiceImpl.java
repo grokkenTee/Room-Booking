@@ -20,12 +20,12 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Room getRoom(String roomId) {
         //TODO chỗ Optional ni xử lí như nào?
-        return roomRepository.findByRoomId(roomId).get();
+        return roomRepository.findByRoomCode(roomId).get();
     }
 
     @Override
     public Room createRoom(Room room) {
-        if (roomRepository.existsByRoomId(room.getRoomId())){
+        if (roomRepository.existsByRoomCode(room.getRoomCode())){
             //TODO nên throw Exception?
             return null;
         }
@@ -34,7 +34,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Room modifyRoom(String roomId, Room room) {
-        Room roomToModify = roomRepository.findByRoomId(roomId).get();
+        Room roomToModify = roomRepository.findByRoomCode(roomId).get();
         if (null == roomToModify){
             return null;
         }
