@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 public class Room extends BaseEntity {
     @Column(unique = true, nullable = false)
-    private String roomNumber;
+    private String roomId;
 
     @Column(nullable = false)
     private Integer capacity;

@@ -11,7 +11,7 @@ public class Booking extends BaseEntity {
     private Long bookingId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_number",referencedColumnName = "roomNumber")
+    @JoinColumn(name = "room_id",referencedColumnName = "roomId")
     private Room room;
 
     @Column(nullable = false)
