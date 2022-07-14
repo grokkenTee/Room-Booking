@@ -1,6 +1,6 @@
 package com.example.bookingroom.entity;
 
-import com.example.bookingroom.common.ERoomType;
+import com.example.bookingroom.common.RoomType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +16,13 @@ import java.util.List;
 @Entity
 public class Room extends BaseEntity {
     @Column(unique = true, nullable = false)
-    private String roomId;
+    private String roomCode;
 
     @Column(nullable = false)
     private Integer capacity;
 
     @Enumerated(EnumType.STRING)
-    private ERoomType roomType;
+    private RoomType roomType;
 
     private String description;
 

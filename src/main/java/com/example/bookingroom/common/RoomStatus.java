@@ -1,6 +1,6 @@
 package com.example.bookingroom.common;
 
-public enum ERoomStatus {
+public enum RoomStatus {
     ACCEPTED,
     DECLINED,
     PENDING
