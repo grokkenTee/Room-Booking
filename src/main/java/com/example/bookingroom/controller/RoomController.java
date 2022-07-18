@@ -3,29 +3,33 @@ package com.example.bookingroom.controller;
 import com.example.bookingroom.entity.Room;
 import com.example.bookingroom.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
 public class RoomController {
     @Autowired
     private RoomService roomService;
 
     @GetMapping("/room")
-    public ResponseEntity<?> getListRoom() {
-        return ResponseEntity.ok(roomService.getAllRoom());
+    @ResponseStatus(HttpStatus.OK)
+    public List<Room> getListRoom() {
+        return roomService.getAllRoom();
     }
 
     @GetMapping("/room/{code}")
-    public ResponseEntity<?> getRoom(
-            @PathVariable("code") String roomCode) {
-        return ResponseEntity.ok(roomService.getRoom(roomCode));
+    @ResponseStatus(HttpStatus.OK)
+    public Room getRoom(@PathVariable("code") String roomCode) {
+        return roomService.getRoom(roomCode);
     }
 
     @PostMapping("/room")
-    public ResponseEntity<?> createRoom(Room room) {
-        return ResponseEntity.ok(roomService.createRoom(room));
+    @ResponseStatus(HttpStatus.OK)
+    public Room createRoom(Room room) {
+        return roomService.createRoom(room);
     }
 
     @PutMapping("/room/{code}")
