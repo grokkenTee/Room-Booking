@@ -2,6 +2,7 @@ package com.example.bookingroom.service;
 
 import com.example.bookingroom.entity.Booking;
 import com.example.bookingroom.entity.Room;
+import com.example.bookingroom.error.RoomNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public interface RoomService {
     List<Room> getAllRoom();
 
-    Room getRoom(String roomId);
+    Room getRoom(String roomId) throws RoomNotFoundException;
 
     Room createRoom(Room room);
 
@@ -18,6 +19,6 @@ public interface RoomService {
 
     void deleteRoom(Room room);
 
-    List<Booking> getListOfBooking(Room room);
+    List<Booking> getListOfBooking(Room room) throws RoomNotFoundException;
 
 }

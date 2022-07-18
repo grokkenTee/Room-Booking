@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
  * Basic Entity for class entity to extend.
  * createdBy, modifiedBy : execute by (user?)
  * createAt, modifyAt: time that execute
+ * version(optlock): check current version, only allow if true, otherwise throw OptimisticLockException
+ * @see <a href="https://www.baeldung.com/jpa-optimistic-locking">jpa optimistic locking</a>
  */
 @MappedSuperclass
 @Getter
-@Setter
 public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -37,9 +38,9 @@ public abstract class BaseEntity implements Serializable {
     @LastModifiedDate
     public LocalDateTime modifyAt;
 
-//    @Version
-//    @Column(name = "optlock", columnDefinition = "integer DEFAULT 0", nullable = false)
-//    private long version = 0L;
+    @Version
+    @Column(name = "optlock", columnDefinition = "bigint DEFAULT 0", nullable = false)
+    private Long version = 0L;
 
     @PrePersist
     public void setCreationDate() {

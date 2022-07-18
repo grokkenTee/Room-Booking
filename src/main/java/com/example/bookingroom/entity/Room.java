@@ -1,6 +1,7 @@
 package com.example.bookingroom.entity;
 
 import com.example.bookingroom.common.RoomType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ public class Room extends BaseEntity {
 
     private String imageUrl;
 
+//    @JsonIgnore
     @OneToMany(mappedBy = "room")
     private List<Booking> bookings;
 }
