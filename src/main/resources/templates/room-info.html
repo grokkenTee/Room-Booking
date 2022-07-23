@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <h3 class="h4 mt-4 mb-4">AddRoom</h3>
+    <hr>
+    <th:block th:if="${message ne null}">
+        <div th:text="${message}" class="alert alert-success" role="alert">
+            this is an alert!
+        </div>
+    </th:block>
+    <!--/*@thymesVar id="room" type="com.example.bookingroom.entity.Room"*/-->
+    <form th:action="@{/room/save}" th:object="${room}" method="POST">
+
+        <input class="form-control" hidden="true" th:field="*{id}" path="id"/>
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="roomCode" class="col-sm-2 col-form-label">Room Code:</label>
+            <div class="col-sm-4">
+                <input class="form-control" th:field="*{roomCode}" th:readonly="${room.id ne null}" id="roomCode"
+                       path="roomCode"/>
+            </div>
+        </div>
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="capacity" class="col-sm-2 col-form-label">Capacity :</label>
+            <div class="col-sm-4">
+                <input class="form-control" th:field="*{capacity}" id="capacity" path="capacity"/>
+            </div>
+        </div>
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="type" class="col-sm-2 col-form-label">Room type :</label>
+            <div class="col-sm-4">
+                <select class="form-control" th:field="*{type}" id="type">
+                    <th:block th:each="type : ${T(com.example.bookingroom.common.RoomType).values()}">
+                        <option th:text="${type}" th:value="${type}"></option>
+                    </th:block>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="status" class="col-sm-2 col-form-label">Room status :</label>
+            <div class="col-sm-4">
+                <select class="form-control" th:field="*{status}" id="status">
+                    <th:block th:each="status : ${T(com.example.bookingroom.common.RoomStatus).values()}">
+                        <option th:text="${status}" th:value="${status}"></option>
+                    </th:block>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="imageUrl" class="col-sm-2 col-form-label">Image:</label>
+            <div class="col-sm-4">
+                <input class="form-control" th:field="*{imageUrl}" id="imageUrl" path="imageUrl"
+                       onchange="document.getElementById('Photo').src = document.getElementById('imageUrl').value"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-lg-offset-2 col-sm-10">
+                <input type="hidden" name="Photo" value="@Model.Photo"/>
+                <img id="Photo" th:src="*{imageUrl}" class="img img-bordered" style="width:200px"/>
+            </div>
+        </div>
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="description" class="col-sm-2 col-form-label">Description:</label>
+            <div class="col-sm-4">
+                <input class="form-control" th:field="*{description}" id="description" path="description"/>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-info col-1">Save</button>
+    </form>
+
+    <hr>
+
+    <a th:href="@{/room}">Back to Room List</a>
+</div>
+</body>
+</html>

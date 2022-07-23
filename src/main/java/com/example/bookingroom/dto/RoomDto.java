@@ -1,13 +1,23 @@
 package com.example.bookingroom.dto;
 
+import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
+import lombok.*;
 
+@Getter
+@Setter
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class RoomDto {
-    private String roomId;
+    private Long id;
+
+    private String roomCode;
 
     private Integer capacity;
 
-    private RoomType roomType;
+    private RoomType type;
+
+    private RoomStatus status;
 
     private String description;
 
