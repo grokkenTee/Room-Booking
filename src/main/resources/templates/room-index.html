@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main-layout.html}">
+<head>
+</head>
+<body>
+<div layout:fragment="content" class="container-fluid">
+    <div th:if="${message ne null}" th:text="${message}" class="alert alert-success" role="alert">
+        this is an alert!
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">&nbsp</h3>
+                    <form id="searchInput" th:action="@{/room}" method="get">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <select th:name="type">
+                                    <option th:value="null">Loại phòng</option>
+                                    <th:block th:each="roomType : ${T(com.example.bookingroom.common.RoomType).values()}">
+                                        <option th:value="${roomType}" th:text="${roomType.getString()}">Type</option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select th:name="status">
+                                    <option th:value="null">Tình trạng</option>
+                                    <th:block
+                                            th:each="roomStatus : ${T(com.example.bookingroom.common.RoomStatus).values()}">
+                                        <option th:value="${roomStatus}" th:text="${roomStatus.getString()}">Type</option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+                            <!--                            <div class="col-sm-6 input-group">-->
+                            <!--                                <input type="text" name="searchValue"-->
+                            <!--                                       class="form-control"-->
+                            <!--                                       placeholder="Nhập tên mặt hàng cần tìm"-->
+                            <!--                                       value="">-->
+                            <!--                                <span class="input-group-btn">-->
+                            <button type="submit" id="search-btn" class="btn btn-flat btn-info">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <a th:href="@{/room/add}" class="btn btn-flat btn-primary" style="margin-left:5px;">
+                                <i class="fa fa-plus"></i> Bổ sung
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <p th:text="'Có tất cả '+${numsRecord}+' bản ghi'"></p>
+                    <table class="table table-hover text-nowrap">
+                        <thead class="bg-cyan">
+                        <tr>
+                            <th>Image</th>
+                            <th>Room Code</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Booking Id</th>
+                            <th>Option</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+<!--                        /*@thymesVar id="rooms" type="com.example.bookingroom.dto.RoomDto"*/-->
+                        <tr th:each="room : ${roomList}">
+                            <td>
+                                <img th:src="${room.imageUrl}" th:alt="'Image for' + ${room.roomCode}"
+                                     class="img-thumbnail" width="300">
+                            </td>
+                            <td th:text="${room.roomCode}">H101</td>
+                            <td th:text="${room.type}">Dinning room</td>
+                            <td>
+                                <th:block th:switch="${room.status}">
+                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).AVAILABLE}"
+                                          th:text="${room.status}"
+                                          class="badge badge-info"></span>
+                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).BUSY}"
+                                          th:text="${room.status}"
+                                          class="badge badge-warning"></span>
+                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).NOT_AVAILABLE}"
+                                          th:text="${room.status}"
+                                          class="badge badge-secondary"></span>
+                                </th:block>
+                            </td>
+                            <td><a href="#">Link to its booking</a></td>
+                            <td class="text-center">
+                                <a th:href="@{/room/detail/{roomCode} (roomCode = ${room.roomCode})}"
+                                   class="btn-sm btn-secondary" style="margin:1px"><i
+                                        class="fa fa-info"></i></a>
+                                <a th:href="@{/room/detail/{roomCode} (roomCode = ${room.roomCode})}"
+                                   class="btn-sm btn-success" style="margin:1px">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a th:href="@{/room/delete/{roomCode} (roomCode = ${room.roomCode})}"
+                                   class="btn-sm btn-warning"
+                                   style="margin:1px">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer clearfix">
+                    <ul class="pagination pagination-md m-0 d-flex justify-content-center">
+                        <th:block th:each="i : ${#numbers.sequence(1, numsPage)}">
+                            <li class="page-item">
+                                <a th:href="@{/room}" th:text="${i}" class="page-link">i</a>
+                            </li>
+                        </th:block>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
