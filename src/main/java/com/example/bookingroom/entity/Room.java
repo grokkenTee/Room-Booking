@@ -1,11 +1,8 @@
 package com.example.bookingroom.entity;
 
+import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +11,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+//TODO thay bang custom toString()
+@ToString
 @Entity
 public class Room extends BaseEntity {
     @Column(unique = true, nullable = false)
@@ -23,13 +22,16 @@ public class Room extends BaseEntity {
     private Integer capacity;
 
     @Enumerated(EnumType.STRING)
-    private RoomType roomType;
+    private RoomType type;
+
+    @Enumerated(EnumType.STRING)
+    private RoomStatus status;
 
     private String description;
 
     private String imageUrl;
 
-//    @JsonIgnore
     @OneToMany(mappedBy = "room")
     private List<Booking> bookings;
+
 }

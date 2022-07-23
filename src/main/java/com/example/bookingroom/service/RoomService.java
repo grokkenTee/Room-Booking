@@ -1,24 +1,34 @@
 package com.example.bookingroom.service;
 
+import com.example.bookingroom.common.RoomStatus;
+import com.example.bookingroom.common.RoomType;
+import com.example.bookingroom.dto.RoomDto;
 import com.example.bookingroom.entity.Booking;
-import com.example.bookingroom.entity.Room;
-import com.example.bookingroom.error.RoomNotFoundException;
+import com.example.bookingroom.exception.RoomNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public interface RoomService {
-    List<Room> getAllRoom();
+    //todo throw ex
+    Page<RoomDto> searchRoom(RoomType type, RoomStatus status, Integer minSize, Integer maxSize, Pageable pageable);
 
-    Room getRoom(String roomId) throws RoomNotFoundException;
+    RoomDto getRoom(String roomCode) throws RoomNotFoundException;
 
-    Room createRoom(Room room);
+    RoomDto getRoom(Long id) throws RoomNotFoundException;
 
-    Room modifyRoom(String roomId, Room room);
+    RoomDto createRoom(RoomDto room) throws Exception;
 
-    void deleteRoom(Room room);
+    RoomDto updateRoom(RoomDto room) throws IllegalArgumentException;
 
-    List<Booking> getListOfBooking(Room room) throws RoomNotFoundException;
+    //TODO throw ex
+    void deleteRoom(RoomDto room);
+
+    Boolean isExists(String roomCode);
+
+    List<Booking> getListOfBooking(RoomDto roomDto);
 
 }
