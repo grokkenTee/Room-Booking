@@ -1,10 +1,11 @@
-package com.example.bookingroom.service.springJpa;
+package com.example.bookingroom.service.impl;
 
 import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
 import com.example.bookingroom.dto.RoomDto;
 import com.example.bookingroom.entity.Booking;
 import com.example.bookingroom.entity.Room;
+import com.example.bookingroom.exception.RoomNotFoundException;
 import com.example.bookingroom.mapper.RoomMapper;
 import com.example.bookingroom.repository.RoomRepository;
 import com.example.bookingroom.service.RoomService;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -28,43 +28,39 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Page<RoomDto> searchRoom(RoomType type, RoomStatus status, Integer minSize, Integer maxSize, Pageable pageable) {
         Page<Room> entityPage = roomRepository.findAllByTypeAndStatusAndCapacityBetween(type, status, minSize, maxSize, pageable);
-        Page<RoomDto> dtoPage = entityPage.map(new Function<Room, RoomDto>() {
-            @Override
-            public RoomDto apply(Room room) {
-                return roomMapper.entityToDto(room);
-            }
-        });
-        return dtoPage;
+        return entityPage
+                .map(room -> roomMapper.toRoomDto(room));
     }
 
     @Override
-    public Optional<RoomDto> getRoom(String roomCode) {
+    public RoomDto getRoom(String roomCode) throws RoomNotFoundException {
         return roomRepository.findByRoomCode(roomCode)
-                .map(roomMapper::entityToDto);
+                .map(roomMapper::toRoomDto)
+                .orElseThrow(() -> new RoomNotFoundException(roomCode));
     }
 
     @Override
-    public Optional<RoomDto> getRoom(Long id) {
+    public RoomDto getRoom(Long id) throws RoomNotFoundException{
         return roomRepository.findById(id)
-                .map(roomMapper::entityToDto);
+                .map(roomMapper::toRoomDto)
+                .orElseThrow(() -> new RoomNotFoundException("Room id column not found " + id));
     }
 
     @Override
-    public RoomDto createRoom(RoomDto roomDtoIn) {
+    public RoomDto createRoom(RoomDto roomDtoIn) throws Exception {
         if (isExists(roomDtoIn.getRoomCode())) {
-            //TODO viết room exists exception
-            return null;
+            throw new Exception("Room is exsisted");
         }
-        Room roomToCreate = roomRepository.save(roomMapper.dtoToEntity(roomDtoIn));
-        return roomMapper.entityToDto(roomToCreate);
+        Room roomToCreate = roomRepository.save(roomMapper.toRoomEntity(roomDtoIn));
+        return roomMapper.toRoomDto(roomToCreate);
     }
 
     @Override
-    public RoomDto modifyRoom(RoomDto roomDtoIn) {
-        Room roomToMod = roomRepository.findByRoomCode(roomDtoIn.getRoomCode()).get();
-        if (roomDtoIn.getId() == null || !(roomDtoIn.getId().equals(roomToMod.getId())))
-            //TODO throw Exception
-            return null;
+    public RoomDto updateRoom(RoomDto roomDtoIn) throws IllegalArgumentException{
+        Room roomToMod = roomRepository.findByRoomCode(roomDtoIn.getRoomCode()).orElse(null);
+        if ((roomDtoIn.getId()) == null || !(roomDtoIn.getId().equals(roomToMod.getId())))
+            throw new IllegalArgumentException("Illegal id: id= "+ roomDtoIn.getId() +" not matching with id in record");
+
         roomToMod.setType(roomDtoIn.getType());
         roomToMod.setStatus(roomDtoIn.getStatus());
         roomToMod.setCapacity(roomDtoIn.getCapacity());
@@ -72,7 +68,7 @@ public class RoomServiceImpl implements RoomService {
         roomToMod.setDescription(roomDtoIn.getDescription());
 
         roomToMod = roomRepository.save(roomToMod);
-        return roomMapper.entityToDto(roomToMod);
+        return roomMapper.toRoomDto(roomToMod);
     }
 
     @Override
@@ -87,8 +83,9 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Optional<List<Booking>> getListOfBooking(RoomDto roomDto) {
+    public List<Booking> getListOfBooking(RoomDto roomDto) {
         return roomRepository.findByRoomCode(roomDto.getRoomCode())
-                .map(Room::getBookings);
+                .map(Room::getBookings)
+                .orElse(null);
     }
 }

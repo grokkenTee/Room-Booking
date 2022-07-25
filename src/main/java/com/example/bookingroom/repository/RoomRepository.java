@@ -14,8 +14,7 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
-
-    @Query("select r from Room r where (:type is null or r.type = :type ) " +
+    @Query("select r from Room r where (:type is null or r.type = :type) " +
                                 " and (:status is null or r.status = :status) " +
                                 " and (r.capacity between :min and :max)")
     Page<Room> findAllByTypeAndStatusAndCapacityBetween(RoomType type, RoomStatus status, Integer min, Integer max, Pageable pageable);
@@ -25,6 +24,5 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     Optional<Room> findAllByType(RoomType type);
 
     boolean existsByRoomCode(String roomCode);
-
 
 }

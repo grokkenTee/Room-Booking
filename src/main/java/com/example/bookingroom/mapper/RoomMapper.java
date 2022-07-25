@@ -3,11 +3,15 @@ package com.example.bookingroom.mapper;
 import com.example.bookingroom.dto.RoomDto;
 import com.example.bookingroom.entity.Room;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface RoomMapper {
-    RoomDto entityToDto(Room room);
+    RoomDto toRoomDto(Room room);
 
-    Room dtoToEntity(RoomDto roomDto);
+    Room toRoomEntity(RoomDto roomDto);
+
+    //TODO for mapping list
+    List<RoomDto> toRoomDtos(List<Room> rooms);
 }

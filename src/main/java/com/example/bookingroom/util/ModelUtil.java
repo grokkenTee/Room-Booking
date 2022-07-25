@@ -9,15 +9,9 @@ import java.util.List;
 /**
  * Utility for getting model (model helper)
  */
+
 public class ModelUtil {
-    public static List<RoomStatus> listRoomStatus() {
-        return Arrays.asList(RoomStatus.values());
-    }
-
-    public static List<RoomType> listRoomType() {
-        return Arrays.asList(RoomType.values());
-    }
-
+    //TODO add format Date -> String
     private ModelUtil() {
     }
 }
