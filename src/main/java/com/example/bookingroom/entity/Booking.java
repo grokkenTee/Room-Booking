@@ -1,6 +1,6 @@
 package com.example.bookingroom.entity;
 
-import com.example.bookingroom.common.RoomStatus;
+import com.example.bookingroom.common.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 public class Booking extends BaseEntity {
-    @Column(unique = true, nullable = false)
-    private Long bookingId;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "room_code",referencedColumnName = "roomCode")
+    @JoinColumn(name = "room_code", referencedColumnName = "roomCode")
     private Room room;
 
     @Column(nullable = false)
@@ -29,5 +26,8 @@ public class Booking extends BaseEntity {
     private LocalDateTime toTime;
 
     @Enumerated(EnumType.STRING)
-    private RoomStatus status;
+    private BookingStatus status;
+
+    @Column(columnDefinition = "text")
+    private String description;
 }
