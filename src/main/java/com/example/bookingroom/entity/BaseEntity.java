@@ -1,5 +1,6 @@
 package com.example.bookingroom.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -25,8 +26,7 @@ public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private @Setter
-    Long id;
+    private @Setter Long id;
 
     @CreatedBy
     private String createdBy;
@@ -38,7 +38,7 @@ public abstract class BaseEntity implements Serializable {
     private LocalDateTime createAt;
 
     @LastModifiedDate
-    public LocalDateTime modifyAt;
+    private LocalDateTime modifyAt;
 
 //    @Getter(AccessLevel.NONE)
 //    //TODO thêm xử lí optimistic lock

@@ -2,6 +2,7 @@ package com.example.bookingroom.entity;
 
 import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,7 +32,7 @@ public class Room extends BaseEntity {
 
     private String imageUrl;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private List<Booking> bookings;
 
 }

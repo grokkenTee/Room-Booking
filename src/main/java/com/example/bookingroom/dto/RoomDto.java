@@ -4,6 +4,10 @@ import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
 import lombok.*;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -11,8 +15,10 @@ import lombok.*;
 public class RoomDto {
     private Long id;
 
+    @NotEmpty(message = "Room code can not be empty please!")
     private String roomCode;
 
+    @Min(value = 0, message = "Capacity must be positive please!")
     private Integer capacity;
 
     private RoomType type;

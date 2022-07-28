@@ -29,14 +29,16 @@
         <div class="form-group row mt-4 mb-4">
             <label for="roomCode" class="col-sm-2 col-form-label">Room Code:</label>
             <div class="col-sm-4">
-                <input class="form-control" th:field="*{roomCode}" th:readonly="${room.id ne null}" id="roomCode"/>
+                <input type="text" class="form-control" th:field="*{roomCode}" th:readonly="${room.id ne null}" id="roomCode"/>
+                <span class="has-error" th:if="${#fields.hasErrors('roomCode')}" th:errors="*{roomCode}"></span>
             </div>
         </div>
 
         <div class="form-group row mt-4 mb-4">
             <label for="capacity" class="col-sm-2 col-form-label">Capacity :</label>
             <div class="col-sm-4">
-                <input class="form-control" th:field="*{capacity}" id="capacity" path="capacity"/>
+                <input type="number" min="0" step="1" oninput="validity.valid||(value='');" class="form-control" th:field="*{capacity}" id="capacity" path="capacity"/>
+                <span class="has-error" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></span>
             </div>
         </div>
 

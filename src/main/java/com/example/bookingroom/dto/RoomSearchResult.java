@@ -2,25 +2,31 @@ package com.example.bookingroom.dto;
 
 import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class RoomSearchResult {
-    public final RoomType type;
-    public final RoomStatus status;
-    public final Integer minCap;
-    public final Integer maxCap;
-    public final Integer page;
-    public final Integer size;
-    public final Long numsOfRecord;
-    public final Integer numsOfPage;
+    private RoomType type = null;
+    private RoomStatus status = null;
 
-    public RoomSearchResult(RoomType type, RoomStatus status, Integer minCap, Integer maxCap, Integer page, Integer size, Long numsOfRecord, Integer numsOfPage) {
-        this.type = type;
-        this.status = status;
-        this.minCap = minCap;
-        this.maxCap = maxCap;
-        this.page = page;
-        this.size = size;
-        this.numsOfRecord = numsOfRecord;
-        this.numsOfPage = numsOfPage;
-    }
+    @NotNull(message = "MinCap must not be null please!")
+    @Min(value = 0, message = "Min cap at least 0 please!")
+    private Integer minCap = 0;
+
+    @NotNull(message = "MaxCap must not be null please!")
+    private Integer maxCap = 99999;
+
+    private Integer page = 1;
+    private Integer size = 10;
+    private Long numsOfRecord = 0L;
+    private Integer numsOfPage = 0;
 }
