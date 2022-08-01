@@ -18,6 +18,7 @@ public class RoomDto {
     @NotEmpty(message = "Room code can not be empty please!")
     private String roomCode;
 
+    @NotNull(message = "Capacity not null please!")
     @Min(value = 0, message = "Capacity must be positive please!")
     private Integer capacity;
 

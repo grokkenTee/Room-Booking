@@ -30,10 +30,29 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private RoomRepository roomRepository;
 
+    //Validate for change state of booking
+    @Override
+    public void validateBusinessLogic(BookingDto bookingDto) throws Exception {
+        LocalDateTime startTime = bookingDto.getStartTime();
+        LocalDateTime endTime = bookingDto.getEndTime();
+        String roomCode = bookingDto.getRoomCode();
+        BookingStatus statusToChange = bookingDto.getStatus();
+
+        if (startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Wrong fromTime - toTime input");
+        }
+        //only check if change status -> ACCEPTED
+        if (BookingStatus.ACCEPTED.equals(statusToChange)) {
+            if (isInUseBetweenTime(roomCode, startTime, endTime)) {
+                throw new Exception("Room " + roomCode + " already busy in this time");
+            }
+        }
+    }
+
     @Override
     public Boolean isInUseBetweenTime(String roomCode, LocalDateTime fromTime, LocalDateTime toTime) {
         return bookingRepository
-                .existsByRoom_RoomCodeAndEndTimeAfterAndStartTimeBeforeAndStatus(roomCode, fromTime, toTime, BUSY_STATUS);
+                .existsByCondition(roomCode, fromTime, toTime, BUSY_STATUS);
     }
 
     @Override
@@ -47,54 +66,79 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Page<BookingDto> searchBooking(String roomCode, BookingStatus status, LocalDateTime fromTime, LocalDateTime toTime, Pageable pageable) {
+    public Page<BookingDto> searchBooking(String roomCode, BookingStatus status, LocalDateTime fromTime, LocalDateTime toTime, Pageable pageRequest) {
         return bookingRepository
-                .findAllByStatus(status, pageable)
+                .searchByCondition(roomCode, status, fromTime, toTime, pageRequest)
                 .map(mapper::toBookingDto);
+    }
+
+    private Booking getBookingEntity(Long id) throws Exception {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new Exception("Wrong booking id"));
     }
 
     @Override
     public BookingDto getBooking(Long id) throws Exception {
         return bookingRepository.findById(id)
                 .map(mapper::toBookingDto)
-                .orElseThrow(() -> new Exception("Id mismatch with DB record"));
+                .orElseThrow(() -> new Exception("Wrong booking id"));
     }
 
     @Override
-    public BookingDto createBooking(BookingDto bookingDto, String roomCode) throws Exception {
-        LocalDateTime startTime = bookingDto.getStartTime();
-        LocalDateTime endTime = bookingDto.getEndTime();
+    public BookingDto createBooking(BookingDto bookingDto) throws Exception {
+        validateBusinessLogic(bookingDto);
 
-        if (startTime.isAfter(endTime)) {
-            throw new IllegalArgumentException("Wrong fromTime-toTime input");
-        } else if (isInUseBetweenTime(roomCode, startTime, endTime)) {
-            throw new Exception("Room " + roomCode + " already busy in this time");
-        } else {
-            Booking bookingToSave = mapper.toBookingEntity(bookingDto);
-            Room room = roomRepository
-                    .findByRoomCode(roomCode)
-                    .orElseThrow(() -> new RoomNotFoundException("Wrong roomCode"));
-            bookingToSave.setRoom(room);
-            //TODO lỏng cái dependency ra đi
-            bookingToSave.setStatus(BookingStatus.ACCEPTED);
+        Booking bookingToSave = mapper.toBookingEntity(bookingDto);
+        Room room = roomRepository
+                .findByRoomCode(bookingDto.getRoomCode())
+                .orElseThrow(() -> new RoomNotFoundException("Wrong roomCode"));
+        bookingToSave.setRoom(room);
 
-            return mapper.toBookingDto(bookingRepository.save(bookingToSave));
+        return mapper.toBookingDto(bookingRepository.save(bookingToSave));
+    }
+
+    @Override
+    public BookingDto modifyBooking(BookingDto bookingDto) throws Exception {
+        //TODO chuyển thêm status vào để check.
+        validateBusinessLogic(bookingDto);
+
+        Booking bookingToMod = getBookingEntity(bookingDto.getId());
+        Room room = roomRepository
+                .findByRoomCode(bookingDto.getRoomCode())
+                .orElseThrow(() -> new RoomNotFoundException("Wrong roomCode"));
+
+        bookingToMod.setRoom(room);
+        bookingToMod.setStartTime(bookingDto.getStartTime());
+        bookingToMod.setEndTime(bookingDto.getEndTime());
+        bookingToMod.setStatus(bookingDto.getStatus());
+        bookingToMod.setDescription(bookingDto.getDescription());
+
+        return mapper.toBookingDto(bookingRepository.save(bookingToMod));
+    }
+
+    @Override
+    public void deleteBooking(BookingDto bookingDto) throws Exception {
+        if (bookingDto.getStatus() != BookingStatus.CANCELED)
+            throw new Exception("Can only delete booking with status is CANCELED");
+        else {
+            Booking bookingToDel = bookingRepository.findById(bookingDto.getId()).orElseThrow();
+            bookingRepository.delete(bookingToDel);
         }
     }
 
-    //TODO chưa xử lí
     @Override
-    public BookingDto updateBooking(BookingDto bookingDto) {
-        return null;
-    }
+    public void updateBookingStatus(Long id, BookingStatus bookingStatus) throws Exception {
+        Booking bookingToUpdate = getBookingEntity(id);
 
-    @Override
-    public void deleteBooking(BookingDto bookingDto) {
-        Booking bookingToDel = bookingRepository
-                .findById(bookingDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Wrong booking id"));
+        String roomCode = bookingToUpdate.getRoom().getRoomCode();
+        LocalDateTime fromTime = bookingToUpdate.getStartTime();
+        LocalDateTime toTime = bookingToUpdate.getEndTime();
 
-        bookingToDel.setStatus(BookingStatus.CANCELED);
-        bookingRepository.save(bookingToDel);
+        if (isInUseBetweenTime(roomCode, fromTime, toTime)) {
+            throw new Exception("Room " + roomCode + " already busy in this time");
+        } else {
+            bookingToUpdate.setStatus(bookingStatus);
+            bookingRepository.save(bookingToUpdate);
+        }
     }
 }

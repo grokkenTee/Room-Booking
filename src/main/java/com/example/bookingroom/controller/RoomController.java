@@ -13,10 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -30,31 +28,31 @@ public class RoomController {
     private RoomService roomService;
 
     @Autowired
-    private RoomSearchValidator searchValidator;
+    private RoomSearchValidator roomSearchValidator;
+
+    @InitBinder("roomSearchResult")
+    protected void initBinder(final WebDataBinder binder) {
+        binder.addValidators(roomSearchValidator);
+    }
 
     @GetMapping(Endpoint.ROOM_INDEX)
-    public String listAll(@Valid RoomSearchResult searchResult, Model model, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
-        searchValidator.validate(searchResult, bindingResult);
+    public String listAll(@Valid RoomSearchResult searchResult, BindingResult bindingResult, Model model) {
+        if (!bindingResult.hasErrors()) {
+            //PageRequest start at index 0
+            Page<RoomDto> roomDtoPage =
+                    roomService.searchRoom(
+                            searchResult.getType(), searchResult.getStatus(), searchResult.getMinCap(), searchResult.getMaxCap(),
+                            PageRequest.of(searchResult.getPage() - 1, searchResult.getSize()));
+            List<RoomDto> roomList = roomDtoPage.toList();
+            //TODO nên để final rồi tạo mới trả về hay là như này?
+            //Set new value, replace default
+            searchResult.setNumsOfRecord(roomDtoPage.getTotalElements());
+            searchResult.setNumsOfPage(roomDtoPage.getTotalPages());
 
-        if (bindingResult.hasErrors()) {
-
-            return "redirect:/room";
+            model.addAttribute("title", "Room Index");
+            model.addAttribute("roomSearchResult", searchResult);
+            model.addAttribute("roomList", roomList);
         }
-
-        //PageRequest start at index 0
-        Page<RoomDto> roomDtoPage =
-                roomService.searchRoom(
-                        searchResult.getType(), searchResult.getStatus(), searchResult.getMinCap(), searchResult.getMaxCap(),
-                        PageRequest.of(searchResult.getPage() - 1, searchResult.getSize()));
-        List<RoomDto> roomList = roomDtoPage.toList();
-        //Set new value, replace default
-        searchResult.setNumsOfRecord(roomDtoPage.getTotalElements());
-        searchResult.setNumsOfPage(roomDtoPage.getTotalPages());
-
-        model.addAttribute("title", "Room Index");
-        model.addAttribute("searchResult", searchResult);
-        model.addAttribute("roomList", roomList);
-
         return "room-index";
     }
 
@@ -63,15 +61,15 @@ public class RoomController {
         RoomDto roomToShow = roomService.getRoom(roomCode);
 
         model.addAttribute("title", "Room Info");
-        model.addAttribute("room", roomToShow);
+        model.addAttribute("roomDto", roomToShow);
 
         return "room-info";
     }
 
     @GetMapping(Endpoint.ROOM_CREATE)
     public String create(Model model) {
-        model.addAttribute("room", new RoomDto());
         model.addAttribute("title", "Create Room");
+        model.addAttribute("roomDto", new RoomDto());
 
         return "room-info";
     }
@@ -79,6 +77,9 @@ public class RoomController {
     @PostMapping(Endpoint.ROOM_SAVE)
     public String save(@Valid @ModelAttribute RoomDto roomToSave, BindingResult bindingResult, RedirectAttributes atts, Model model) {
         String error;
+        if (bindingResult.hasErrors())
+            return "room-info";
+
         if (roomToSave.getId() == null) {
             try {
                 roomService.createRoom(roomToSave);
@@ -97,7 +98,7 @@ public class RoomController {
             }
         }
         model.addAttribute("error", error);
-        model.addAttribute("room", roomToSave);
+        model.addAttribute("roomDto", roomToSave);
 
         return "room-info";
     }

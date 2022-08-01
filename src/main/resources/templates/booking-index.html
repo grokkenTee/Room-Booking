@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{main-layout.html}">
+      layout:decorate="~{main-layout.html}"
+      th:with="df=${@environment.getProperty('date.format')}">
 <head>
 </head>
 <body>
@@ -17,117 +18,178 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">&nbsp</h3>
-                    <form id="searchInput" th:action="@{/booking}" method="post">
+                    <form id="searchInput" th:action="@{/booking}" th:object="${bookingSearchResult}" method="get">
                         <div class="row">
-                            <div class="col-sm-3">
-                                <label for="fromDate">
-                                    <input id="fromDate" type="datetime-local" th:name="from" th:value="${fromDate}">
-                                </label>
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="from-group">
+                                            <label for="fromDate">From Time:</label>
+                                            <input class="form-control" id="fromDate" type="datetime-local"
+                                                   th:field="*{fromTime}"
+                                                   th:value="*{fromTime}">
+                                            <span class="has-error" th:if="${#fields.hasErrors('fromTime')}"
+                                                  th:errors="*{fromTime}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="toDate">To Time:</label>
+                                            <input class="form-control" id="toDate" type="datetime-local"
+                                                   th:field="*{toTime}"
+                                                   th:value="*{toTime}">
+                                            <span class="has-error" th:if="${#fields.hasErrors('toTime')}"
+                                                  th:errors="*{toTime}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="roomCode">Room:</label>
+                                            <select class="form-control" id="roomCode" th:field="*{roomCode}">
+                                                <option th:value="null">Pick a room</option>
+                                                <th:block th:each="roomCode : ${roomCodeList}">
+                                                    <option th:value="${roomCode}" th:text="${roomCode}"
+                                                            th:selected="${roomCode} eq *{roomCode}">room code
+                                                    </option>
+                                                </th:block>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="status">Booking status:</label>
+                                            <select class="form-control" id="status" th:field="*{status}">
+                                                <option th:value="null">Pick a status</option>
+                                                <th:block
+                                                        th:each="bookingStatus : ${T(com.example.bookingroom.common.BookingStatus).values()}">
+                                                    <option th:value="${bookingStatus}"
+                                                            th:text="${bookingStatus.getString()}"
+                                                            th:selected="${bookingStatus} eq *{status}">Type
+                                                    </option>
+                                                </th:block>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-sm-3">
-                                <label for="toDate">
-                                    <input id="toDate" type="datetime-local" th:name="to" th:value="${toDate}">
-                                </label>
+                            <div class="col-3">
+                                <!--                            <div class="col-sm-6 input-group">-->
+                                <!--                                <input type="text" name="searchValue"-->
+                                <!--                                       class="form-control"-->
+                                <!--                                       placeholder="Nhập tên mặt hàng cần tìm"-->
+                                <!--                                       value="">-->
+                                <!--                                <span class="input-group-btn">-->
+                                <div class="row d-flex">
+                                    <button id="resetSearch" type="button" class="btn btn-app">
+                                        <i class="fa fa-eraser"></i>Reset
+                                    </button>
+                                    <button type="submit" id="search-btn" class="btn btn-app">
+                                        <i class="fa fa-search"></i>Find
+                                    </button>
+                                    <a th:href="@{/booking/add}" class="btn btn-app" style="margin-left:5px;">
+                                        <i class="fa fa-plus"></i>New
+                                    </a>
+                                </div>
                             </div>
-                            <div class="col-sm-3">
-                                <select th:name="roomCode">
-                                    <option th:value="null">Pick a room</option>
-<!--                                    TODO get list roomCode-->
-                                    <th:block th:each="roomStatus : ${T(com.example.bookingroom.common.RoomStatus).values()}">
-                                        <option th:value="${roomStatus}" th:text="${roomStatus.getString()}"
-                                                th:selected="${roomStatus} eq ${status}">Type
-                                        </option>
-                                    </th:block>
-                                </select>
-                            </div>
-                            <!--                            <div class="col-sm-6 input-group">-->
-                            <!--                                <input type="text" name="searchValue"-->
-                            <!--                                       class="form-control"-->
-                            <!--                                       placeholder="Nhập tên mặt hàng cần tìm"-->
-                            <!--                                       value="">-->
-                            <!--                                <span class="input-group-btn">-->
-                            <button type="submit" id="search-btn" class="btn btn-flat btn-info">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            <a th:href="@{/booking/add}" class="btn btn-flat btn-primary" style="margin-left:5px;">
-                                <i class="fa fa-plus"></i> Add new
-                            </a>
                         </div>
                     </form>
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body table-responsive p-0">
-<!--                    <p th:text="'Có tất cả '+${numsRecord}+' bản ghi'"></p>-->
-                    <table class="table table-hover text-nowrap">
-                        <thead class="bg-cyan">
-                        <tr>
-                            <th>Id</th>
-                            <th>Room Code</th>
-                            <th>Status</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Description</th>
-                            <th class="text-center">Option</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!--/*@thymesVar id="bookingList" type="com.example.bookingroom.entity.Booking"*/-->
-                        <tr th:each="booking : ${bookingList}">
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0">
+                <!--                    <p th:text="'Có tất cả '+${numsRecord}+' bản ghi'"></p>-->
+                <table class="table table-hover text-nowrap table-striped">
+                    <thead class="bg-cyan">
+                    <tr>
+                        <th>Id</th>
+                        <th>Room Code</th>
+                        <th>Status</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Description</th>
+                        <th class="text-center">Option</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!--/*@thymesVar id="bookingList" type="com.example.bookingroom.entity.Booking"*/-->
+                    <tr th:each="booking : ${bookingList}">
+                        <form >
                             <td th:text="${booking.id}"></td>
-                            <td th:text="${booking.roomCode}">H101</td>
-                            <td th:text="${booking.status}">Processing</td>
-<!--                            <td>-->
-<!--                                <p th:text="${status}"></p>-->
-<!--                                <th:block th:switch="${room.status}">-->
-<!--                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).AVAILABLE}"-->
-<!--                                          th:text="${room.status}"-->
-<!--                                          class="badge badge-info"></span>-->
-<!--                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).BUSY}"-->
-<!--                                          th:text="${room.status}"-->
-<!--                                          class="badge badge-warning"></span>-->
-<!--                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).NOT_AVAILABLE}"-->
-<!--                                          th:text="${room.status}"-->
-<!--                                          class="badge badge-secondary"></span>-->
-<!--                                </th:block>-->
-<!--                            </td>-->
-                            <td th:text="${#temporals.format(booking.getStartTime(), 'yyyy-MM-dd HH:mm')}"></td>
-                            <td th:text="${#temporals.format(booking.getEndTime(), 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <a th:href="@{/room/detail/{roomCode} (roomCode=${booking.roomCode})}"
+                                   th:text="${booking.roomCode}">room code</a>
+                            </td>
+                            <td class="row">
+                                <p th:text="${booking.status}">Processing</p>
+                                <div class="dropdown">
+                                    <button class="btn btn-warning btn-sm dropdown-toggle" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                        <i class="fa fa-right-left"></i>
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
+                                         th:each="bookingStatus : ${T(com.example.bookingroom.common.BookingStatus).values()}">
+                                        <a class="dropdown-item" href="#">Processing</a>
+                                        <a class="dropdown-item" href="#">Accepted</a>
+                                        <a class="dropdown-item" href="#">Declined</a>
+                                        <a class="dropdown-item" href="#">Completed</a>
+                                        <a class="dropdown-item" href="#">Canceled</a>
+                                    </div>
+                                </div>
+                            </td>
+                            <!--                            <td>-->
+                            <!--                                <th:block th:switch="${room.status}">-->
+                            <!--                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).AVAILABLE}"-->
+                            <!--                                          th:text="${room.status}"-->
+                            <!--                                          class="badge badge-info"></span>-->
+                            <!--                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).BUSY}"-->
+                            <!--                                          th:text="${room.status}"-->
+                            <!--                                          class="badge badge-warning"></span>-->
+                            <!--                                    <span th:case="${T(com.example.bookingroom.common.RoomStatus).NOT_AVAILABLE}"-->
+                            <!--                                          th:text="${room.status}"-->
+                            <!--                                          class="badge badge-secondary"></span>-->
+                            <!--                                </th:block>-->
+                            <!--                            </td>-->
+                            <td th:text="${#temporals.format(booking.getStartTime(), df)}"></td>
+                            <td th:text="${#temporals.format(booking.getEndTime(), df)}"></td>
                             <td th:text="${booking.description}"></td>
                             <td class="text-center">
                                 <a th:href="@{/booking/detail/{id} (id = ${booking.id})}"
-                                   class="btn-sm btn-secondary" style="margin:1px"><i
-                                        class="fa fa-info"></i></a>
-                                <a th:href="@{/booking/detail/{id} (id = ${booking.id})}"
-                                   class="btn-sm btn-success" style="margin:1px">
+                                   class="btn-sm btn-secondary" style="margin:1px">
                                     <i class="fa fa-edit"></i>
                                 </a>
                                 <a th:href="@{/booking/delete/{id} (id = ${booking.id})}"
-                                   class="btn-sm btn-warning"
-                                   style="margin:1px">
-                                    <i class="fa fa-remove"></i>
+                                   class="btn-sm btn-danger" style="margin:1px">
+                                    <i class="fa fa-trash"></i>
                                 </a>
                             </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- /.card-body -->
-
-<!--                <div class="card-footer clearfix">-->
-<!--                    <ul class="pagination pagination-md m-0 d-flex justify-content-center">-->
-<!--                        <th:block th:each="i : ${#numbers.sequence(0, numsPage-1)}">-->
-<!--                            <li class="page-item">-->
-<!--                                <a th:href="@{/room(type=${type},status=${status},page=${i})}" th:text="${i}"-->
-<!--                                   class="page-link">i</a>-->
-<!--                            </li>-->
-<!--                        </th:block>-->
-<!--                    </ul>-->
-<!--                </div>-->
+                        </form>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
-            <!-- /.card -->
+            <!-- /.card-body -->
+
+            <div class="card-footer clearfix">
+                <ul class="pagination pagination-md m-0 d-flex justify-content-center">
+                    <th:block th:with="sr=${bookingSearchResult}"
+                              th:each="i : ${#numbers.sequence(1, bookingSearchResult.numsOfPage, 1)}">
+                        <li class="page-item">
+                            <a th:href="@{/booking(page=${i},size=${sr.size},roomCode=${sr.roomCode},status=${sr.status},fromTime=${sr.fromTime},toTime=${sr.toTime})}"
+                               th:text="${i}"
+                               class="page-link">i</a>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
         </div>
+        <!-- /.card -->
     </div>
+</div>
 </div>
 </body>
 </html>

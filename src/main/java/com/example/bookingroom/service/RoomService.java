@@ -14,9 +14,10 @@ import java.util.List;
 
 @Service
 public interface RoomService {
+    List<String> getListRoomCode();
+
     Room getRoomEntity(String roomCode) throws RoomNotFoundException;
 
-    //todo throw ex
     Page<RoomDto> searchRoom(RoomType type, RoomStatus status, Integer minSize, Integer maxSize, Pageable pageable);
 
     RoomDto getRoom(String roomCode) throws RoomNotFoundException;

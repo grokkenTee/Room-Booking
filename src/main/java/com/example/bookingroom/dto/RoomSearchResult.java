@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
@@ -19,7 +18,6 @@ public class RoomSearchResult {
     private RoomStatus status = null;
 
     @NotNull(message = "MinCap must not be null please!")
-    @Min(value = 0, message = "Min cap at least 0 please!")
     private Integer minCap = 0;
 
     @NotNull(message = "MaxCap must not be null please!")
@@ -29,4 +27,5 @@ public class RoomSearchResult {
     private Integer size = 10;
     private Long numsOfRecord = 0L;
     private Integer numsOfPage = 0;
+
 }

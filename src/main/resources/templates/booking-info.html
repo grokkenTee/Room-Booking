@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{main-layout.html}">
+      layout:decorate="~{main-layout.html}"
+th:with="df=${@environment.getProperty('date.format')}">
 <head>
 </head>
 <body>
@@ -20,18 +21,30 @@
         </div>
     </th:block>
 
-    <!--/*@thymesVar id="booking" type="com.example.bookingroom.dto.BookingDto"*/-->
-    <form th:action="@{/booking/save}" th:object="${booking}" method="POST">
-        <input class="form-control" hidden="true" th:field="*{id}" path="id"/>
-        <div class="form-group row mt-4 mb-4">
-            <label for="roomCode" class="col-sm-2 col-form-label">Room: </label>
+    <!--/*@thymesVar id="bookingDto" type="com.example.bookingroom.dto.BookingDto"*/-->
+    <form th:action="@{/booking/save}" th:object="${bookingDto}" method="POST">
+        <div class="form-group row mt-4 mb-4" th:hidden="*{id} eq null">
+            <label class="col-sm-2 col-form-label">Booking id:</label>
             <div class="col-sm-4">
-                <!--                <select class="form-control" th:field="*{roomCode}" id="roomCode">-->
-                <!--                    <th:block th:each="room : ${}">-->
-                <!--                        <option th:text="${type.getString()}" th:value="${type}"></option>-->
-                <!--                    </th:block>-->
-                <!--                </select>-->
-                <input class="form-control" th:field="*{roomCode}" id="roomCode">
+                <input class="form-control" th:field="*{id}" path="id" readonly/>
+            </div>
+        </div>
+
+        <div class="form-group row mt-4 mb-4">
+            <label class="col-sm-2 col-form-label">Room: </label>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <select id="roomCode" th:field="*{roomCode}" class="form-control" style="width: 100%;">
+                        <option th:value="null">Pick a room</option>
+                        <th:block th:each="roomCode : ${roomCodeList}">
+                            <option th:value="${roomCode}" th:text="${roomCode}"
+                                    th:selected="${roomCode} eq *{roomCode}">room code
+                            </option>
+                        </th:block>
+                    </select>
+                    <span class="error text-danger" th:if="${#fields.hasErrors('roomCode')}"
+                          th:errors="*{roomCode}"></span>
+                </div>
             </div>
         </div>
 
@@ -39,6 +52,7 @@
             <label for="fromTime" class="col-sm-2 col-form-label">From Time:</label>
             <div class="col-sm-4">
                 <input class="form-control" type="datetime-local" th:field="*{startTime}" id="fromTime"/>
+                <span class="error text-danger" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></span>
             </div>
         </div>
 
@@ -46,6 +60,22 @@
             <label for="toTime" class="col-sm-2 col-form-label">To Time:</label>
             <div class="col-sm-4">
                 <input class="form-control" type="datetime-local" th:field="*{endTime}" id="toTime"/>
+                <span class="error text-danger" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></span>
+            </div>
+        </div>
+
+        <div class="form-group row mt-4 mb-4">
+            <label for="toTime" class="col-sm-2 col-form-label">Booking Status</label>
+            <div class="col-sm-4">
+                <select class="form-control" id="status" th:field="*{status}">
+                    <option th:value="null">Pick a status</option>
+                    <th:block th:each="bookingStatus : ${T(com.example.bookingroom.common.BookingStatus).values()}">
+                        <option th:value="${bookingStatus}" th:text="${bookingStatus.getString()}"
+                                th:selected="${bookingStatus} eq *{status}">Type
+                        </option>
+                    </th:block>
+                </select>
+                <span class="error text-danger" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
             </div>
         </div>
 

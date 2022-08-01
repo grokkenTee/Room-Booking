@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -23,6 +24,13 @@ public class RoomServiceImpl implements RoomService {
     private RoomRepository roomRepository;
 
     private RoomMapper roomMapper = Mappers.getMapper(RoomMapper.class);
+
+    @Override
+    public List<String> getListRoomCode() {
+        return roomRepository.findAll()
+                .stream().map(Room::getRoomCode)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Room getRoomEntity(String roomCode) throws RoomNotFoundException{
@@ -33,7 +41,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Page<RoomDto> searchRoom(RoomType type, RoomStatus status, Integer minSize, Integer maxSize, Pageable pageable) {
-        Page<Room> entityPage = roomRepository.findAllByTypeAndStatusAndCapacityBetween(type, status, minSize, maxSize, pageable);
+        Page<Room> entityPage = roomRepository.searchByCondition(type, status, minSize, maxSize, pageable);
         return entityPage
                 .map(room -> roomMapper.toRoomDto(room));
     }

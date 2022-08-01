@@ -21,16 +21,17 @@
             this is an alert!
         </div>
     </th:block>
-    <!--/*@thymesVar id="room" type="com.example.bookingroom.entity.Room"*/-->
-    <form th:action="@{/room/save}" th:object="${room}" method="POST">
+
+    <!--/*@thymesVar id="roomDto" type="com.example.bookingroom.dto.RoomDto"*/-->
+    <form th:action="@{/room/save}" th:object="${roomDto}" method="POST">
 
         <input class="form-control" hidden="true" th:field="*{id}" path="id"/>
 
         <div class="form-group row mt-4 mb-4">
             <label for="roomCode" class="col-sm-2 col-form-label">Room Code:</label>
             <div class="col-sm-4">
-                <input type="text" class="form-control" th:field="*{roomCode}" th:readonly="${room.id ne null}" id="roomCode"/>
-                <span class="has-error" th:if="${#fields.hasErrors('roomCode')}" th:errors="*{roomCode}"></span>
+                <input type="text" class="form-control" th:field="*{roomCode}" th:readonly="${roomDto.id ne null}" id="roomCode"/>
+                <span class="error text-danger" th:if="${#fields.hasErrors('roomCode')}" th:errors="*{roomCode}"></span>
             </div>
         </div>
 
@@ -38,7 +39,7 @@
             <label for="capacity" class="col-sm-2 col-form-label">Capacity :</label>
             <div class="col-sm-4">
                 <input type="number" min="0" step="1" oninput="validity.valid||(value='');" class="form-control" th:field="*{capacity}" id="capacity" path="capacity"/>
-                <span class="has-error" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></span>
+                <span class="error text-danger" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></span>
             </div>
         </div>
 
@@ -75,7 +76,6 @@
 
         <div class="form-group">
             <div class="col-lg-offset-2 col-sm-10">
-                <input type="hidden" name="Photo" value="@Model.Photo"/>
                 <img id="Photo" th:src="*{imageUrl}" class="img img-bordered" style="width:200px"/>
             </div>
         </div>

@@ -12,9 +12,11 @@ import java.util.List;
 
 @Service
 public interface BookingService {
+    void validateBusinessLogic(BookingDto bookingDto) throws Exception;
+
     Boolean isInUseBetweenTime(String roomCode, LocalDateTime fromTime, LocalDateTime toTime);
 
-    Page<BookingDto> searchBooking(String roomCode, BookingStatus status, LocalDateTime fromTime, LocalDateTime toTime, Pageable pageable);
+    Page<BookingDto> searchBooking(String roomCode, BookingStatus status, LocalDateTime fromTime, LocalDateTime toTime, Pageable pageRequest);
 
     List<BookingDto> getAllBooking();
 
@@ -22,9 +24,11 @@ public interface BookingService {
 
     BookingDto getBooking(Long id) throws Exception;
 
-    BookingDto createBooking(BookingDto bookingDto, String roomCode) throws Exception;
+    BookingDto createBooking(BookingDto bookingDto) throws Exception;
 
-    BookingDto updateBooking(BookingDto bookingDto);
+    BookingDto modifyBooking(BookingDto bookingDto) throws Exception;
 
-    void deleteBooking(BookingDto bookingDto);
+    void deleteBooking(BookingDto bookingDto) throws Exception;
+
+    void updateBookingStatus(Long id, BookingStatus bookingStatus) throws Exception;
 }

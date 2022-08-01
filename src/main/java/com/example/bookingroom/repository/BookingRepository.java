@@ -14,12 +14,22 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
-    Page<Booking> findAllByStatus(BookingStatus status, Pageable pageable);
+    @Query("select b from Booking b" +
+            " where (:roomCode is null or :roomCode = '' or b.room.roomCode = :roomCode)" +
+            " and (:status is null or b.status = :status)" +
+            //nếu xử lí ngoài kia thì 2 thằng Time chắc chắn k null -> có thể bỏ
+            " and (((:fromTime is null) and (:toTime is null))" +
+            "    or ((b.startTime > :fromTime) and (b.endTime < :toTime)))")
+    Page<Booking> searchByCondition(String roomCode, BookingStatus status,
+                                    LocalDateTime fromTime, LocalDateTime toTime, Pageable pageable);
 
     Optional<Booking> findById(Long id);
 
-
-    @Query("select (count(b) > 0) from Booking b " +
-            "where b.room.roomCode = :roomCode and b.endTime > :fromTime and b.startTime < :toTime and b.status = :status")
-    boolean existsByRoom_RoomCodeAndEndTimeAfterAndStartTimeBeforeAndStatus(@Param("roomCode") String roomCode, @Param("fromTime") LocalDateTime fromTime, @Param("toTime") LocalDateTime toTime, @Param("status") BookingStatus status);
+    @Query("select (count(b) > 0) from Booking b" +
+            " where b.room.roomCode = :roomCode" +
+            " and b.endTime > :fromTime" +
+            " and b.startTime < :toTime" +
+            " and b.status = :status")
+    boolean existsByCondition(String roomCode, LocalDateTime fromTime,
+                              LocalDateTime toTime, BookingStatus status);
 }

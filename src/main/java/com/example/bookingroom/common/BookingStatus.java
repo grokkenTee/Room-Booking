@@ -9,7 +9,6 @@ public enum BookingStatus {
 
     private final String status;
 
-
     BookingStatus(String status) {
         this.status = status;
     }
