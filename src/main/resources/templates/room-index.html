@@ -17,46 +17,50 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">&nbsp</h3>
-                    <form id="searchInput" th:action="@{/room}" method="get">
+                    <!--/*@thymesVar id="search" type="com.example.bookingroom.dto.RoomSearchResult"*/-->
+                    <form id="searchInput" th:object="${roomSearchResult}" th:action="@{/room}" method="get">
                         <div class="row">
-                            <div class="col-sm-3">
-                                <div class="row">
-                                    <label for="type">Room Type</label>
-                                    <select id="type" th:name="type">
-                                        <option th:value="null">Select a type of room</option>
-                                        <th:block
-                                                th:each="roomType : ${T(com.example.bookingroom.common.RoomType).values()}">
-                                            <option th:value="${roomType}" th:text="${roomType.getString()}"
-                                                    th:selected="${roomType} eq ${searchResult.type}">Type
-                                            </option>
-                                        </th:block>
-                                    </select>
-                                </div>
+                            <div class="form-group col-md-2">
+                                <label for="type">Room Type</label>
+                                <select class="form-control" id="type" th:field="*{type}">
+                                    <option th:value="null">-- Select a type of room --</option>
+                                    <th:block
+                                            th:each="roomType : ${T(com.example.bookingroom.common.RoomType).values()}">
+                                        <option th:value="${roomType}" th:text="${roomType.getString()}">Type
+                                        </option>
+                                    </th:block>
+                                </select>
                             </div>
 
-                            <div class="col-sm-3">
-                                <div class="row">
-                                    <label for="status">Room Status</label>
-                                    <select id="status" th:name="status">
-                                        <option th:value="null">Select a room status</option>
-                                        <th:block
-                                                th:each="roomStatus : ${T(com.example.bookingroom.common.RoomStatus).values()}">
-                                            <option th:value="${roomStatus}" th:text="${roomStatus.getString()}"
-                                                    th:selected="${roomStatus} eq ${searchResult.status}">Type
-                                            </option>
-                                        </th:block>
-                                    </select>
-                                </div>
+
+                            <div class="form-group col-md-2">
+                                <label for="status">Room Status</label>
+                                <select class="form-control" id="status" th:field="*{status}">
+                                    <option th:value="null">-- Select a room status --</option>
+                                    <th:block
+                                            th:each="roomStatus : ${T(com.example.bookingroom.common.RoomStatus).values()}">
+                                        <option th:value="${roomStatus}" th:text="${roomStatus.getString()}">Type
+                                        </option>
+                                    </th:block>
+                                </select>
                             </div>
 
-                            <div class="col-sm-2">
+
+                            <div class="from-group col-md-2">
                                 <label for="minCap">Min capacity</label>
-                                <input id="minCap" type="number" th:name="min" th:value="${searchResult.minCap}">
+                                <input class="form-control" id="minCap" th:field="*{minCap}" th:value="*{minCap}"
+                                       type="number" min="0" step="1" oninput="validity.valid||(value='');">
+<!--                                <span class="has-error" th:if="${#fields.hasErrors('minCap')}"-->
+<!--                                      th:errors="*{minCap}"></span>-->
+                                <p class="error" th:if="${#fields.hasErrors('minCap')}" th:errorclass="error" th:errors="*{minCap}" />
                             </div>
-                            <div class="col-sm-2">
+
+                            <div class="form-group col-md-2">
                                 <label for="maxCap">Max capacity</label>
-                                <input id="maxCap" type="number" th:name="max" th:value="${searchResult.maxCap}">
+                                <input class="form-control" id="maxCap" th:field="*{maxCap}" th:value="*{maxCap}"
+                                       type="number" min="0" step="1" oninput="validity.valid||(value='');">
+                                <span class="has-error" th:if="${#fields.hasErrors('maxCap')}"
+                                      th:errors="*{maxCap}"></span>
                             </div>
                             <!--                            <div class="col-sm-6 input-group">-->
                             <!--                                <input type="text" name="searchValue"-->
@@ -65,26 +69,33 @@
                             <!--                                       value="">-->
                             <!--                                <span class="input-group-btn">-->
                             <!--                            </div>-->
-                            <button type="submit" id="search-btn" class="btn btn-flat btn-info">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            <a th:href="@{/room/add}" class="btn btn-flat btn-primary" style="margin-left:5px;">
-                                <i class="fa fa-plus"></i> Bổ sung
-                            </a>
+                            <div class="row d-flex">
+                                <button id="resetSearch" type="button" class="btn btn-app">
+                                    <i class="fa fa-eraser"></i>Reset
+                                </button>
+                                <button type="submit" id="search-btn" class="btn btn-app">
+                                    <i class="fa fa-search"></i>Find
+                                </button>
+                                <a th:href="@{/room/add}" class="btn btn-app" style="margin-left:5px;">
+                                    <i class="fa fa-plus"></i>New
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body table-responsive p-0">
-                    <p th:text="'Có tất cả '+${searchResult.numsOfRecord}+' bản ghi trên tổng số '+${searchResult.numsOfPage}+' trang. ('+${searchResult.size}+' record mỗi trang)'"></p>
-                    <table class="table table-hover text-nowrap">
+                    <p th:text="'Có tất cả '+${roomSearchResult.numsOfRecord}+' bản ghi trên tổng số '+${roomSearchResult.numsOfPage}+' trang. ('+${roomSearchResult.size}+' record mỗi trang)'"></p>
+                    <table class="table table-hover text-nowrap table-striped">
                         <thead class="bg-cyan">
                         <tr>
                             <th>Image</th>
                             <th>Room Code</th>
                             <th>Type</th>
                             <th>Status</th>
-                            <th>Booking Id</th>
+                            <th>Booked</th>
+                            <th>Booking History</th>
+                            <th>Description</th>
                             <th>Option</th>
                         </tr>
                         </thead>
@@ -98,7 +109,6 @@
                             <td th:text="${room.roomCode}">H101</td>
                             <td th:text="${room.type.getString()}">Dinning room</td>
                             <td>
-                                <p th:text="${room.status.getString()}"></p>
                                 <th:block th:switch="${room.status}">
                                     <span th:case="${T(com.example.bookingroom.common.RoomStatus).AVAILABLE}"
                                           th:text="${room.status.getString()}"
@@ -111,11 +121,14 @@
                                           class="badge badge-secondary"></span>
                                 </th:block>
                             </td>
-                            <td><a href="#">Link to its booking</a></td>
-                            <td class="text-center">
-                                <a th:href="@{/room/detail/{roomCode} (roomCode = ${room.roomCode})}"
-                                   class="btn-sm btn-secondary" style="margin:1px"><i
-                                        class="fa fa-info"></i></a>
+                            <td>
+                                <a href="#">Booking id / '-'</a>
+                            </td>
+                            <td>
+                                <a th:href="@{/booking(roomCode=${room.roomCode})}">Booking History</a>
+                            </td>
+                            <td th:text="${room.description}"></td>
+                            <td>
                                 <a th:href="@{/room/detail/{roomCode} (roomCode = ${room.roomCode})}"
                                    class="btn-sm btn-success" style="margin:1px">
                                     <i class="fa fa-edit"></i>
@@ -134,9 +147,10 @@
 
                 <div class="card-footer clearfix">
                     <ul class="pagination pagination-md m-0 d-flex justify-content-center">
-                        <th:block th:each="i : ${#numbers.sequence(1, searchResult.numsOfPage, 1)}">
+                        <th:block th:with="sr=${roomSearchResult}"
+                                  th:each="i : ${#numbers.sequence(1, roomSearchResult.numsOfPage, 1)}">
                             <li class="page-item">
-                                <a th:href="@{/room(page=${i},size=${searchResult.size},type=${searchResult.type},status=${searchResult.status},min=${searchResult.minCap},max=${searchResult.maxCap})}"
+                                <a th:href="@{/room(page=${i},size=${sr.size},type=${sr.type},status=${sr.status},min=${sr.minCap},max=${sr.maxCap})}"
                                    th:text="${i}"
                                    class="page-link">i</a>
                             </li>

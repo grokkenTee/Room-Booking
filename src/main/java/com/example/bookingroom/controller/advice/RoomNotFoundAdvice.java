@@ -1,4 +1,4 @@
-package com.example.bookingroom.exception.advice;
+package com.example.bookingroom.controller.advice;
 
 import com.example.bookingroom.exception.RoomNotFoundException;
 import org.springframework.http.HttpStatus;

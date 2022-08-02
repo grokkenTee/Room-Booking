@@ -17,7 +17,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query("select r from Room r where (:type is null or r.type = :type) " +
                                 " and (:status is null or r.status = :status) " +
                                 " and (r.capacity between :min and :max)")
-    Page<Room> findAllByTypeAndStatusAndCapacityBetween(RoomType type, RoomStatus status, Integer min, Integer max, Pageable pageable);
+    Page<Room> searchByCondition(RoomType type, RoomStatus status, Integer min, Integer max, Pageable pageable);
 
     Optional<Room> findByRoomCode(String roomCode);
 

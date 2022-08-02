@@ -4,6 +4,7 @@ import com.example.bookingroom.common.RoomStatus;
 import com.example.bookingroom.common.RoomType;
 import com.example.bookingroom.dto.RoomDto;
 import com.example.bookingroom.entity.Booking;
+import com.example.bookingroom.entity.Room;
 import com.example.bookingroom.exception.RoomNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,10 @@ import java.util.List;
 
 @Service
 public interface RoomService {
-    //todo throw ex
+    List<String> getListRoomCode();
+
+    Room getRoomEntity(String roomCode) throws RoomNotFoundException;
+
     Page<RoomDto> searchRoom(RoomType type, RoomStatus status, Integer minSize, Integer maxSize, Pageable pageable);
 
     RoomDto getRoom(String roomCode) throws RoomNotFoundException;

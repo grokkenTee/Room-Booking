@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -26,8 +26,22 @@ public class RoomServiceImpl implements RoomService {
     private RoomMapper roomMapper = Mappers.getMapper(RoomMapper.class);
 
     @Override
+    public List<String> getListRoomCode() {
+        return roomRepository.findAll()
+                .stream().map(Room::getRoomCode)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Room getRoomEntity(String roomCode) throws RoomNotFoundException{
+        return roomRepository
+                .findByRoomCode(roomCode)
+                .orElseThrow(() -> new RoomNotFoundException(roomCode));
+    }
+
+    @Override
     public Page<RoomDto> searchRoom(RoomType type, RoomStatus status, Integer minSize, Integer maxSize, Pageable pageable) {
-        Page<Room> entityPage = roomRepository.findAllByTypeAndStatusAndCapacityBetween(type, status, minSize, maxSize, pageable);
+        Page<Room> entityPage = roomRepository.searchByCondition(type, status, minSize, maxSize, pageable);
         return entityPage
                 .map(room -> roomMapper.toRoomDto(room));
     }
@@ -40,7 +54,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomDto getRoom(Long id) throws RoomNotFoundException{
+    public RoomDto getRoom(Long id) throws RoomNotFoundException {
         return roomRepository.findById(id)
                 .map(roomMapper::toRoomDto)
                 .orElseThrow(() -> new RoomNotFoundException("Room id column not found " + id));
@@ -49,17 +63,17 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RoomDto createRoom(RoomDto roomDtoIn) throws Exception {
         if (isExists(roomDtoIn.getRoomCode())) {
-            throw new Exception("Room is exsisted");
+            throw new Exception("Room is existed");
         }
         Room roomToCreate = roomRepository.save(roomMapper.toRoomEntity(roomDtoIn));
         return roomMapper.toRoomDto(roomToCreate);
     }
 
     @Override
-    public RoomDto updateRoom(RoomDto roomDtoIn) throws IllegalArgumentException{
+    public RoomDto updateRoom(RoomDto roomDtoIn) throws IllegalArgumentException {
         Room roomToMod = roomRepository.findByRoomCode(roomDtoIn.getRoomCode()).orElse(null);
         if ((roomDtoIn.getId()) == null || !(roomDtoIn.getId().equals(roomToMod.getId())))
-            throw new IllegalArgumentException("Illegal id: id= "+ roomDtoIn.getId() +" not matching with id in record");
+            throw new IllegalArgumentException("Illegal id: id= " + roomDtoIn.getId() + " not matching with id in record");
 
         roomToMod.setType(roomDtoIn.getType());
         roomToMod.setStatus(roomDtoIn.getStatus());
@@ -84,7 +98,8 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<Booking> getListOfBooking(RoomDto roomDto) {
-        return roomRepository.findByRoomCode(roomDto.getRoomCode())
+        return roomRepository
+                .findByRoomCode(roomDto.getRoomCode())
                 .map(Room::getBookings)
                 .orElse(null);
     }
